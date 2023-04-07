@@ -1,1 +1,1 @@
-info about the last project of 2021
+A collection of short useful scripts to make molecular biology easier.
