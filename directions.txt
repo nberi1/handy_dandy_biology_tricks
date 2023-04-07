@@ -1,0 +1,34 @@
+How to run checkInserts.py to check if your oligo of interest is in the sequenced fragment
+
+0. You need python3
+	if you don't have it I can help you install it
+
+1. Download and unzip your sequencing results
+
+2. Copy the files in the checkInserts folder into the folder containing the sequencing results
+	checkInserts.py
+	guide_oligos.csv
+	directions.txt (optional)
+
+3. Fill in the columns of guide_oligos.csv with your sequences
+	you can put in as many sequences as you would like
+	Save and close the file
+
+4a. To get results for all files in the folder
+	Run the following line of code:
+
+for FILE in *.seq; do \ python3 checkInserts.py $FILE >> results.txt \ done
+
+OR 
+
+4b. To get results for just ONE file at a time
+	Replace (FILENAME) with the sequencing file you want to check
+	Run the following line of code:
+
+python3 checkInserts.py (FILENAME).seq >> results.txt
+
+5. results.txt now contains a list of matched sequences
+
+Notes: - As of now the program only checks sequences in column 2
+	column 3 is a placeholder for checking revcoms
+
