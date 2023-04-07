@@ -1,0 +1,50 @@
+#!/bin/bash
+# editing 3/13/2023
+
+# requires an input .sam file and a chrom.sizes file
+while getopts i:s:o:g: flag
+do
+        case "${flag}" in
+                i) inputDir=${OPTARG};;
+                s) samp=${OPTARG};;
+                o) outDir=${OPTARG};;
+                g) genome=${OPTARG};;
+        esac
+done
+
+# check everything looks ok
+printf "Input directory: ${inputDir} \nFilename: ${samp} \nOutput directory: ${outDir} \nGenome: ${genome} \n\n"
+
+# combine the genome with the standardized file ext .chrom.sizes to get var $chromsizes
+chromsizes="${genome}.chrom.sizes"
+
+# print a few lines from chromsizes
+echo "$chromsizes includes chromosomes like: "
+
+head -10 $chromsizes
+
+printf " \n"
+
+# take .sam input file and convert to .bam
+samtools view -S -b $inputDir/$samp.sam > $outDir/$samp.bam
+echo ">> created bam"
+
+# sort the bam file
+samtools sort -o $outDir/$samp.sorted.bam -T $outDir/temp $outDir/$samp.bam
+echo ">> sorted bam"
+
+# index  the sorted bam
+samtools index -b $outDir/$samp.sorted.bam
+echo ">> indexed the sorted bam"
+
+# convert bam to bedgraph
+bedtools genomecov -ibam $outDir/$samp.bam -bg > $outDir/$samp.bedgraph
+echo ">> converted the sorted bam to bedgraph"
+
+# sort the bedgraph
+sort -k1,1 -k2,2n $outDir/$samp.bedgraph > $outDir/$samp.sorted.bedgraph
+echo ">> sorted the bedgraph"
+
+# convert bedgraph to .bw
+bedGraphToBigWig $outDir/$samp.sorted.bedgraph $chromsizes $outDir/$samp.bw
+echo ">> converted the bedgraph to .bw"
