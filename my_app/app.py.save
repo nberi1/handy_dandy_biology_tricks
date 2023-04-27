@@ -1,0 +1,42 @@
+# test shiny for python app
+from shiny import *
+from shiny.types import FileInfo
+
+import pandas as pd
+
+# ui section
+app_ui = ui.page_fluid(
+    ui.layout_sidebar(
+        ui.panel_sidebar(
+#            ui.input_radio_buttons(id = 'input_type', label = 'Are your oligo(s) in a file or text string?', choices = ['File', 'Text string']),
+            ui.input_file(id = 'oligos', 
+                label = 'Oligos', 
+                placeholder = 'Select oligos.csv file'),
+            ui.input_checkbox('header', 
+                'My oligo data has headers', 
+                False),
+            ui.input_file('sequence', 'Sequence files', 
+                placeholder = 'Select sequence(s) to compare', 
+                multiple = True),
+      ),
+
+# output(s)
+    ui.panel_main(ui.output_ui('contents'),
+                    ui.output_table('),
+#    ui.output_table('contents'[0]),
+  )
+)
+
+def server(input: Inputs, output: Outputs, session: Session):
+    @output
+    @render.ui
+    def contents():
+        if input.file1() is None:
+            return "Please upload a csv file"
+        f: list[FileInfo] = input.file1()
+        df = pd.read_csv(f[0]["datapath"], header = 0 if input.header() else None)
+
+return ui.HTML(df.to_html(classes="table table-striped"))
+
+# call app
+app = App(app_ui, server)
